@@ -1,0 +1,17 @@
+{application, streamy,
+ [{description, "A discord bot for tracking streams"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {streamy_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    discordant,
+    mnesia
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["The Unlicense"]},
+  {links, []}
+ ]}.
