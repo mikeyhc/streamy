@@ -9,26 +9,37 @@
 
 -export([start/2, stop/1]).
 
+-define(TABLES, [streamy_request,
+                 streamy_show,
+                 streamy_playlist
+                ]).
+
 start(_StartType, _StartArgs) ->
     Token = case os:getenv("DISCORD_TOKEN") of
                 false -> throw({missing_env, "DISCORD_TOKEN"});
                 V -> V
             end,
-    streamy_request:install(),
+    lists:foreach(fun(Name) -> apply(Name, install, []) end, ?TABLES),
     discordant:connect(Token),
     Routes = #{
         <<"request">> => #{call => {streamy_request, request, []},
-                           args => ["anime name"],
-                           help => "Request an anime be added to the database"
+                           args => ["show name"],
+                           help => "Request an show be added to the database"
                           },
         <<"pending">> => #{call => {streamy_request, pending, []},
                            args => [],
                            help => "List all pending requests"
                           },
-        <<"ping">> => #{call => {streamy, pong, []},
-                        args => [],
-                        help => "PONG!"
-                       }
+        <<"show-add">> => #{call => {streamy_show, add_show, []},
+                            args => ["show name", "imdb link"],
+                            help => "Add a show to the database",
+                            authenticated => true
+                           },
+        <<"playlist-add">> => #{call => {streamy_playlist, add_entry, []},
+                                args => ["show name"],
+                                help => "Add a show to the playlist",
+                                authenticated => true
+                               }
     },
     discordant:set_routes(Routes, []),
     streamy_sup:start_link().

@@ -1,7 +1,7 @@
 -module(mnesia_utils).
 -include_lib("kernel/include/logger.hrl").
 
--export([create/3]).
+-export([create/3, write/1]).
 
 create(Name, Fields, Overrides) ->
     Defaults = [{attributes, Fields},
@@ -15,3 +15,6 @@ create(Name, Fields, Overrides) ->
             ?LOG_INFO("installing ~p table", [Name]),
             mnesia:create_table(Name, Options)
     end.
+
+write(Entry) ->
+    mnesia:activity(transaction, fun() -> mnesia:write(Entry) end).
